@@ -354,7 +354,7 @@ export default function PlayPage() {
               {resultData.learning && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-500 p-4 rounded-lg">
                   <p className="text-blue-800 dark:text-blue-200 italic">
-                    "{resultData.learning}"
+                    &quot;{resultData.learning}&quot;
                   </p>
                 </div>
               )}
@@ -455,7 +455,7 @@ export default function PlayPage() {
               All Five HX Values Restored!
             </h2>
             <p className="text-xl text-gray-700 dark:text-gray-300 mb-6">
-              The AI Core is now fully operational. You've successfully demonstrated all 
+              The AI Core is now fully operational. You&apos;ve successfully demonstrated all 
               five Holiday Extras values through your choices and problem-solving.
             </p>
           </div>

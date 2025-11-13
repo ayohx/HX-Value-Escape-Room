@@ -169,7 +169,7 @@ export default function TimedChoice({
           className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-500 rounded-lg text-center"
         >
           <p className="text-red-800 dark:text-red-200 font-semibold">
-            ⏰ Time's up! The breach continues spreading...
+            ⏰ Time&apos;s up! The breach continues spreading...
           </p>
         </motion.div>
       )}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from '@/components/ui/Button'
 
@@ -48,9 +48,9 @@ export default function MatchingChoice({
   const [selectedPowerUp, setSelectedPowerUp] = useState<string | null>(null)
 
   // Check if all matches are correct
-  const checkMatches = () => {
+  const checkMatches = useCallback(() => {
     return pairs.every(pair => matches[pair.left] === pair.right)
-  }
+  }, [pairs, matches])
 
   // Handle clicking a left trait
   const handleLeftClick = (trait: string) => {
@@ -96,7 +96,7 @@ export default function MatchingChoice({
         setTimeout(() => setShowPowerUps(true), 500)
       }
     }
-  }, [matches])
+  }, [matches, checkMatches])
 
   const isCorrectMatch = (left: string, right: string | null) => {
     if (!right) return false
@@ -118,7 +118,7 @@ export default function MatchingChoice({
       {/* Instructions */}
       <div className="text-center space-y-2">
         <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
-          Match your "old you" to your upgraded self
+          Match your &quot;old you&quot; to your upgraded self
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Click a trait on the left, then click its match on the right
