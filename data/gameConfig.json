@@ -67,6 +67,10 @@
             "learning": "Sometimes restraint preserves stability."
           }
         }
+      },
+      "onSuccess": {
+        "message": "Bold move confirmed! The firewall stabilises, glowing brighter than before.",
+        "learning": "Courage means acting despite fear — progress demands bold steps."
       }
     },
     {
