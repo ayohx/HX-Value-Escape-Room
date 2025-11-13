@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
@@ -49,26 +50,32 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.5 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
           >
             {[
-              'Be At The Helm',
-              'Be Courageous',
-              'Be One Team',
-              'Be The Best Version of You',
-              'Be Pioneering in Spirit',
+              { name: 'Be At The Helm', image: '/assets/placeholders/room-helm.gif' },
+              { name: 'Be Courageous', image: '/assets/placeholders/room-firewall.gif' },
+              { name: 'Be One Team', image: '/assets/placeholders/room-connection.gif' },
+              { name: 'Be The Best Version of You', image: '/assets/placeholders/room-upgrade.gif' },
+              { name: 'Be Pioneering in Spirit', image: '/assets/placeholders/room-innovation.gif' },
             ].map((value, index) => (
               <motion.div
-                key={value}
-                className="bg-white/5 border border-white/10 rounded-md p-3 hover:bg-white/10 transition-colors"
-                initial={{ opacity: 0, scale: 0.9 }}
+                key={value.name}
+                className="flex flex-col items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all hover:scale-105"
+                initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.7 + index * 0.1 }}
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-400" />
-                  <span className="font-medium">{value}</span>
+                <div className="w-16 h-16 sm:w-20 sm:h-20 relative">
+                  <Image
+                    src={value.image}
+                    alt={value.name}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
                 </div>
+                <span className="font-medium text-xs sm:text-sm text-center">{value.name}</span>
               </motion.div>
             ))}
           </motion.div>

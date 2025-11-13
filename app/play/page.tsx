@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { gameEngine } from '@/lib/GameEngine'
 import { useGameStore } from '@/stores/gameStore'
@@ -238,6 +239,15 @@ export default function PlayPage() {
     ? gameEngine.getRoomIds().indexOf(currentRoomId) + 1
     : 0
 
+  // Map room IDs to badge images
+  const roomBadges: Record<string, string> = {
+    room1_helm: '/assets/placeholders/room-helm.gif',
+    room2_firewall: '/assets/placeholders/room-firewall.gif',
+    room3_one_team: '/assets/placeholders/room-connection.gif',
+    room4_upgrade: '/assets/placeholders/room-upgrade.gif',
+    room5_innovation: '/assets/placeholders/room-innovation.gif',
+  }
+
   return (
     <>
       <Header
@@ -288,7 +298,17 @@ export default function PlayPage() {
             className="space-y-6"
           >
             <div className="text-center">
-              <div className="text-6xl mb-4">🎯</div>
+              <div className="flex justify-center mb-4">
+                <div className="w-24 h-24 relative">
+                  <Image
+                    src={roomBadges[currentRoomConfig.id] || '/assets/placeholders/room-helm.gif'}
+                    alt={currentRoomConfig.value}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+              </div>
               <h3 className="text-2xl font-bold mb-2">{currentRoomConfig.roomTitle}</h3>
               <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold">
                 {currentRoomConfig.value}
