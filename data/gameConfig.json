@@ -1,0 +1,175 @@
+{
+  "title": "Holiday Extras Arcade Escape Room",
+  "rooms": [
+    {
+      "id": "room1_helm",
+      "value": "Be At The Helm",
+      "roomTitle": "The Command Deck",
+      "type": "reorder",
+      "task": {
+        "instruction": "Reorder the command chain to restore navigation control",
+        "items": ["Act", "Plan", "Communicate", "Decide"],
+        "correctOrder": ["Plan", "Decide", "Communicate", "Act"],
+        "interaction": "drag-and-drop OR click-to-select-order",
+        "timeLimitSeconds": null
+      },
+      "onSuccess": {
+        "message": "Command chain restored. Navigation stabilised.",
+        "learning": "Leaders act with clarity, not certainty — they steer forward when others hesitate."
+      }
+    },
+    {
+      "id": "room2_firewall",
+      "value": "Be Courageous",
+      "roomTitle": "The Firewall Zone",
+      "type": "timed-choice",
+      "task": {
+        "instruction": "A viral breach is spreading. Pick an override strategy within 30 seconds.",
+        "choices": [
+          {
+            "id": "safe_delay",
+            "label": "Play it safe and delay the launch",
+            "outcome": "partial"
+          },
+          {
+            "id": "risky_pilot",
+            "label": "Pilot a risky new feature to contain the breach",
+            "outcome": "success"
+          },
+          {
+            "id": "shutdown",
+            "label": "Shut everything down and hope for the best",
+            "outcome": "fail"
+          }
+        ],
+        "timeLimitSeconds": 30
+      },
+      "branching": {
+        "successPath": {
+          "nextEvent": "red_button_revealed"
+        }
+      },
+      "additionalEvent": {
+        "id": "red_button_revealed",
+        "instruction": "A red button blinks in the corner. Do you press it?",
+        "type": "binary",
+        "choices": [
+          { "id": "press_yes", "label": "Yes" },
+          { "id": "press_no", "label": "No" }
+        ],
+        "outcomes": {
+          "press_yes": {
+            "message": "You pressed it. Hidden door slides open — Courage unlocked the path forward.",
+            "learning": "Courage means acting despite fear."
+          },
+          "press_no": {
+            "message": "You resisted the temptation. The system stabilises but the door stays closed.",
+            "learning": "Sometimes restraint preserves stability."
+          }
+        }
+      }
+    },
+    {
+      "id": "room3_one_team",
+      "value": "Be One Team",
+      "roomTitle": "The Connection Chamber",
+      "type": "multi-step",
+      "task": {
+        "steps": [
+          {
+            "instruction": "A colleague's mistake delays an important booking. Choose how to respond.",
+            "choices": [
+              {
+                "id": "fix_quiet",
+                "label": "Fix it quietly and move on",
+                "result": "partial"
+              },
+              {
+                "id": "blame",
+                "label": "Blame them for slowing you down",
+                "result": "fail"
+              },
+              {
+                "id": "support",
+                "label": "Work together and support them to resolve it",
+                "result": "success"
+              }
+            ]
+          },
+          {
+            "instruction": "Repair the connection grid: connect the broken nodes into a continuous circuit.",
+            "type": "mini-puzzle",
+            "mechanic": "connect-nodes",
+            "gridSize": "3x3",
+            "timeLimitSeconds": 45
+          }
+        ]
+      },
+      "onSuccess": {
+        "message": "You supported your teammate and restored the connection grid.",
+        "learning": "Collaboration creates clarity — unity unlocks the next level."
+      }
+    },
+    {
+      "id": "room4_upgrade",
+      "value": "Be The Best Version of You",
+      "roomTitle": "The Upgrade Chamber",
+      "type": "matching-choice",
+      "task": {
+        "instruction": "Match your 'old you' to your upgraded self, then choose a power-up trait.",
+        "pairs": [
+          { "left": "Hesitant", "right": "Proactive" },
+          { "left": "Comfortable", "right": "Curious" }
+        ],
+        "powerUpChoices": [
+          { "id": "adaptability", "label": "Adaptability" },
+          { "id": "empathy", "label": "Empathy" },
+          { "id": "focus", "label": "Focus" },
+          { "id": "curiosity", "label": "Curiosity" }
+        ],
+        "correctPowerUp": "curiosity"
+      },
+      "onSuccess": {
+        "message": "Upgrade complete. Curiosity fuels growth.",
+        "learning": "Growth fuels excellence — self-improvement powers the whole system."
+      }
+    },
+    {
+      "id": "room5_innovation",
+      "value": "Be Pioneering in Spirit",
+      "roomTitle": "The Innovation Lab",
+      "type": "choice-final",
+      "task": {
+        "instruction": "Which new concept will you develop?",
+        "choices": [
+          {
+            "id": "improve_tool",
+            "label": "A tool that improves existing systems"
+          },
+          {
+            "id": "map_trip",
+            "label": "A map that plans your trip before you do"
+          },
+          {
+            "id": "wait_for_proof",
+            "label": "A system that waits for proof before testing"
+          }
+        ]
+      },
+      "finalPuzzle": {
+        "instruction": "What's the real key to discovery?",
+        "choices": [
+          { "id": "success", "label": "Success" },
+          { "id": "failure", "label": "Failure" },
+          { "id": "luck", "label": "Luck" }
+        ],
+        "correct": "failure"
+      },
+      "onSuccess": {
+        "message": "Failure — the true engine of discovery. The AI Core glows bright.",
+        "learning": "Each misstep sparks innovation, each setback fuels progress."
+      }
+    }
+  ]
+}
+
