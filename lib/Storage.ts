@@ -1,6 +1,41 @@
 import { PlayerProgress, RoomProgress } from './types'
 
 const STORAGE_KEY = 'hx-escape-room-progress'
+const TOKEN_KEY = 'hx-room-tokens'
+
+// ── Room token storage (Level 2 anti-cheat) ──────────────────────────────────
+
+export interface StoredRoomToken {
+  roomId: string
+  completedAt: number
+  sig: string
+}
+
+export function storeRoomToken(token: StoredRoomToken): void {
+  if (typeof window === 'undefined') return
+  try {
+    const existing = getStoredTokens().filter((t) => t.roomId !== token.roomId)
+    existing.push(token)
+    localStorage.setItem(TOKEN_KEY, JSON.stringify(existing))
+  } catch { /* storage unavailable */ }
+}
+
+export function getStoredTokens(): StoredRoomToken[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const stored = localStorage.getItem(TOKEN_KEY)
+    return stored ? (JSON.parse(stored) as StoredRoomToken[]) : []
+  } catch {
+    return []
+  }
+}
+
+export function clearRoomTokens(): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(TOKEN_KEY)
+  } catch { /* storage unavailable */ }
+}
 
 /**
  * Generate a unique player ID
@@ -153,9 +188,9 @@ export function useHint(roomId: string): void {
  */
 export function resetProgress(): void {
   if (typeof window === 'undefined') return
-  
   try {
     localStorage.removeItem(STORAGE_KEY)
+    clearRoomTokens()
   } catch (error) {
     console.error('Failed to reset progress:', error)
   }

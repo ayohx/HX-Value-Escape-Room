@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button'
 
 interface ReorderPuzzleProps {
   items: string[]
-  correctOrder: string[]
+  correctOrder?: string[]
   onSubmit: (order: string[]) => void
   disabled?: boolean
 }

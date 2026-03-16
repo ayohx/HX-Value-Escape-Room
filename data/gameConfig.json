@@ -9,7 +9,6 @@
       "task": {
         "instruction": "Reorder the command chain to restore navigation control",
         "items": ["Act", "Plan", "Communicate", "Decide"],
-        "correctOrder": ["Plan", "Decide", "Communicate", "Act"],
         "interaction": "drag-and-drop OR click-to-select-order",
         "timeLimitSeconds": null
       },
@@ -28,26 +27,18 @@
         "choices": [
           {
             "id": "safe_delay",
-            "label": "Play it safe and delay the launch",
-            "outcome": "partial"
+            "label": "Play it safe and delay the launch"
           },
           {
             "id": "risky_pilot",
-            "label": "Pilot a risky new feature to contain the breach",
-            "outcome": "success"
+            "label": "Pilot a risky new feature to contain the breach"
           },
           {
             "id": "shutdown",
-            "label": "Shut everything down and hope for the best",
-            "outcome": "fail"
+            "label": "Shut everything down and hope for the best"
           }
         ],
         "timeLimitSeconds": 30
-      },
-      "branching": {
-        "successPath": {
-          "nextEvent": "red_button_revealed"
-        }
       },
       "additionalEvent": {
         "id": "red_button_revealed",
@@ -85,18 +76,15 @@
             "choices": [
               {
                 "id": "fix_quiet",
-                "label": "Fix it quietly and move on",
-                "result": "partial"
+                "label": "Fix it quietly and move on"
               },
               {
                 "id": "blame",
-                "label": "Blame them for slowing you down",
-                "result": "fail"
+                "label": "Blame them for slowing you down"
               },
               {
                 "id": "support",
-                "label": "Work together and support them to resolve it",
-                "result": "success"
+                "label": "Work together and support them to resolve it"
               }
             ]
           },
@@ -130,8 +118,7 @@
           { "id": "empathy", "label": "Empathy" },
           { "id": "focus", "label": "Focus" },
           { "id": "curiosity", "label": "Curiosity" }
-        ],
-        "correctPowerUp": "curiosity"
+        ]
       },
       "onSuccess": {
         "message": "Upgrade complete. Curiosity fuels growth.",
@@ -166,8 +153,7 @@
           { "id": "success", "label": "Success" },
           { "id": "failure", "label": "Failure" },
           { "id": "luck", "label": "Luck" }
-        ],
-        "correct": "failure"
+        ]
       },
       "onSuccess": {
         "message": "Failure — the true engine of discovery. The AI Core glows bright.",
@@ -176,4 +162,3 @@
     }
   ]
 }
-

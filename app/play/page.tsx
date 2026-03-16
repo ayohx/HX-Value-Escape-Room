@@ -10,6 +10,7 @@ import Header from '@/components/layout/Header'
 import HUD from '@/components/layout/HUD'
 import RoomStage from '@/components/layout/RoomStage'
 import Toast from '@/components/ui/Toast'
+import { storeRoomToken, getStoredTokens, StoredRoomToken } from '@/lib/Storage'
 
 // Import puzzle components
 import ReorderPuzzle from '@/components/puzzles/ReorderPuzzle'
@@ -70,48 +71,63 @@ export default function PlayPage() {
     }
   }, [currentRoomId, setGameState, startRoomTimer])
 
-  // Handle room submission
+  // Handle room submission — validates server-side, stores signed token on success
   const handleRoomSubmit = useCallback(async (payload: any) => {
-    if (!currentRoomId) return
+    if (!currentRoomId || !currentRoomConfig) return
 
     const timeTaken = getRoomElapsedTime()
-    const result = gameEngine.submitRoomResult(currentRoomId, payload, timeTaken)
 
-    if (result.success) {
+    let apiResult: { success: boolean; message?: string; nextEvent?: boolean; token?: StoredRoomToken }
+    try {
+      const response = await fetch('/api/check-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: currentRoomId, payload }),
+      })
+      apiResult = await response.json()
+    } catch {
+      setToast({ message: '⚠️ Connection error — please try again', type: 'error' })
+      return
+    }
+
+    if (apiResult.success) {
+      // Store the signed completion token (Level 2)
+      if (apiResult.token) {
+        storeRoomToken(apiResult.token)
+      }
+
+      // Record completion in engine (no re-validation)
+      gameEngine.recordRoomCompletion(currentRoomId, timeTaken)
+
       setGameState('result_success')
       setResultData({
         success: true,
-        message: result.message,
-        learning: result.learning,
+        message: currentRoomConfig.onSuccess.message,
+        learning: currentRoomConfig.onSuccess.learning,
       })
       setShowResult(true)
 
-      // Check if there's an additional event (Room 2 red button)
-      if (result.nextEvent) {
-        setAdditionalEvent(result.nextEvent)
+      // Room 2: trigger additional event (red button) if nextEvent flag set
+      if (apiResult.nextEvent) {
+        setAdditionalEvent(currentRoomConfig.additionalEvent)
       }
 
-      // Check if all rooms completed
       if (gameEngine.checkAllRoomsCompleted()) {
-        setTimeout(() => {
-          setShowCompletionModal(true)
-        }, 2000)
+        setTimeout(() => setShowCompletionModal(true), 2000)
       }
     } else {
+      gameEngine.recordRoomFailure(currentRoomId)
       setGameState('result_fail')
       setResultData({
         success: false,
-        message: result.message,
+        message: apiResult.message ?? 'Not quite right. Try again!',
       })
       setShowResult(true)
     }
 
-    // Reload progress
     const updatedProgress = gameEngine.getGameState()
-    if (updatedProgress) {
-      setPlayerProgress(updatedProgress)
-    }
-  }, [currentRoomId, getRoomElapsedTime, setGameState, setPlayerProgress])
+    if (updatedProgress) setPlayerProgress(updatedProgress)
+  }, [currentRoomId, currentRoomConfig, getRoomElapsedTime, setGameState, setPlayerProgress])
 
   // Handle additional event submission
   const handleAdditionalEventSubmit = useCallback((eventChoiceId: string) => {
@@ -125,8 +141,30 @@ export default function PlayPage() {
     setAdditionalEvent(null)
   }, [additionalEvent, currentRoomId])
 
-  // Continue to next room
-  const continueToNextRoom = useCallback(() => {
+  // Continue to next room — verify signed token before advancing (Level 2)
+  const continueToNextRoom = useCallback(async () => {
+    // Verify the just-completed room's token is valid before advancing
+    if (currentRoomId) {
+      const tokens = getStoredTokens()
+      const completedToken = tokens.find((t) => t.roomId === currentRoomId)
+      if (completedToken) {
+        try {
+          const res = await fetch('/api/verify-progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tokens: [completedToken] }),
+          })
+          const { validRooms } = await res.json()
+          if (!validRooms.includes(currentRoomId)) {
+            setToast({ message: '⚠️ Progress verification failed — please retry the room', type: 'error' })
+            return
+          }
+        } catch {
+          // Graceful degradation — allow advancement on network error
+        }
+      }
+    }
+
     setShowResult(false)
     setResultData(null)
 
@@ -139,7 +177,7 @@ export default function PlayPage() {
         setShowBriefing(true)
       }
     }
-  }, [setCurrentRoom, setGameState])
+  }, [currentRoomId, setCurrentRoom, setGameState])
 
   // Retry current room
   const retryRoom = useCallback(() => {
