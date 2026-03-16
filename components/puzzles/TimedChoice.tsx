@@ -76,7 +76,7 @@ export default function TimedChoice({
           </span>
           <motion.span
             className={`text-2xl font-bold ${
-              isWarning ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'
+              isWarning ? 'text-red-600 dark:text-red-400' : 'text-[#542E91]'
             }`}
             animate={isWarning ? { scale: [1, 1.1, 1] } : {}}
             transition={{ duration: 0.5, repeat: isWarning ? Infinity : 0 }}
@@ -87,7 +87,7 @@ export default function TimedChoice({
         <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <motion.div
             className={`h-full ${
-              isWarning ? 'bg-red-600' : 'bg-blue-600'
+              isWarning ? 'bg-red-600' : 'bg-[#542E91]'
             }`}
             initial={{ width: '100%' }}
             animate={{ width: `${progressPercentage}%` }}
@@ -114,11 +114,11 @@ export default function TimedChoice({
                 w-full p-4 rounded-lg border-2 text-left transition-all
                 ${
                   isSelected
-                    ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-lg'
-                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-blue-400 hover:shadow-md'
+                    ? 'border-[#542E91] bg-purple-50 dark:bg-purple-900/20 shadow-lg'
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-[#542E91]/60 hover:shadow-md'
                 }
                 ${disabled || hasTimedOut ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600
+                focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#542E91]
               `}
               whileHover={!disabled && !hasTimedOut ? { scale: 1.02 } : {}}
               whileTap={!disabled && !hasTimedOut ? { scale: 0.98 } : {}}
@@ -136,7 +136,7 @@ export default function TimedChoice({
                     w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
                     ${
                       isSelected
-                        ? 'border-blue-600 bg-blue-600'
+                        ? 'border-[#542E91] bg-[#542E91]'
                         : 'border-gray-400 dark:border-gray-500'
                     }
                   `}

@@ -9,9 +9,6 @@ import { useGameStore } from '@/stores/gameStore'
 import Header from '@/components/layout/Header'
 import HUD from '@/components/layout/HUD'
 import RoomStage from '@/components/layout/RoomStage'
-import Button from '@/components/ui/Button'
-import Card from '@/components/ui/Card'
-import Modal from '@/components/ui/Modal'
 import Toast from '@/components/ui/Toast'
 
 // Import puzzle components
@@ -162,6 +159,14 @@ export default function PlayPage() {
     router.push('/')
   }, [router])
 
+  // Handle reset
+  const handleReset = useCallback(() => {
+    if (window.confirm('Reset the game and start from Room 1?')) {
+      gameEngine.resetGame()
+      window.location.reload()
+    }
+  }, [])
+
   // Render puzzle based on room type
   const renderPuzzle = () => {
     if (!currentRoomConfig) return null
@@ -255,6 +260,7 @@ export default function PlayPage() {
         totalRooms={5}
         onPause={handlePause}
         onExit={handleExit}
+        onReset={handleReset}
         showProgress={true}
       />
 
@@ -292,7 +298,7 @@ export default function PlayPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/75 backdrop-blur-md"
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             />
 
             {/* Card */}
@@ -452,160 +458,270 @@ export default function PlayPage() {
         )}
       </AnimatePresence>
 
-      {/* Result Modal */}
-      <Modal
-        isOpen={showResult}
-        onClose={() => {}}
-        closeOnOverlayClick={false}
-        showCloseButton={false}
-        title={resultData?.success ? '✅ Mission Success' : '⚠️ Try Again'}
-        size="lg"
-      >
-        {resultData && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="space-y-6"
-          >
-            <div className="text-center">
-              <div className="text-6xl mb-4">
-                {resultData.success ? '🎉' : '🔄'}
-              </div>
-              <p className="text-xl font-semibold mb-4">{resultData.message}</p>
-
-              {resultData.learning && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-500 p-4 rounded-lg">
-                  <p className="text-blue-800 dark:text-blue-200 italic">
-                    &quot;{resultData.learning}&quot;
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="flex gap-3 justify-center">
-              {resultData.success ? (
-                <Button size="lg" onClick={continueToNextRoom}>
-                  Continue
-                </Button>
-              ) : (
-                <>
-                  <Button variant="secondary" onClick={handleExit}>
-                    Exit
-                  </Button>
-                  <Button size="lg" onClick={retryRoom}>
-                    Retry
-                  </Button>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </Modal>
-
-      {/* Additional Event Modal (Room 2 Red Button) */}
-      <Modal
-        isOpen={!!additionalEvent}
-        onClose={() => {}}
-        closeOnOverlayClick={false}
-        showCloseButton={false}
-        title={additionalEvent?.instruction}
-        size="md"
-      >
-        {additionalEvent && (
-          <div className="space-y-6">
-            <div className="text-center text-6xl">🔴</div>
-
-            <div className="flex gap-3 justify-center">
-              {additionalEvent.choices.map((choice: any) => (
-                <Button
-                  key={choice.id}
-                  size="lg"
-                  onClick={() => handleAdditionalEventSubmit(choice.id)}
-                >
-                  {choice.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-      </Modal>
-
-      {/* Pause Modal */}
-      <Modal
-        isOpen={showPauseModal}
-        onClose={() => setShowPauseModal(false)}
-        title="Game Paused"
-      >
-        <div className="space-y-4 text-center">
-          <p className="text-gray-700 dark:text-gray-300">
-            Your progress is automatically saved. Take your time!
-          </p>
-          <div className="flex gap-3 justify-center">
-            <Button onClick={() => setShowPauseModal(false)}>Resume</Button>
-            <Button variant="secondary" onClick={handleExit}>
-              Exit to Menu
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Completion Modal */}
-      <Modal
-        isOpen={showCompletionModal}
-        onClose={() => {}}
-        closeOnOverlayClick={false}
-        showCloseButton={false}
-        title="🏆 Mission Complete"
-        size="xl"
-      >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="space-y-6 text-center"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-            className="text-8xl"
-          >
-            🎉
-          </motion.div>
-
-          <div>
-            <h2 className="text-3xl font-bold mb-4">
-              All Five HX Values Restored!
-            </h2>
-            <p className="text-xl text-gray-700 dark:text-gray-300 mb-6">
-              The AI Core is now fully operational. You&apos;ve successfully demonstrated all 
-              five Holiday Extras values through your choices and problem-solving.
-            </p>
-          </div>
-
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-6 rounded-lg border border-blue-500">
-            <h3 className="font-semibold text-lg mb-3">Your Score</h3>
-            <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">
-              {playerProgress?.totalScore || 0}
-            </p>
-          </div>
-
-          <div className="flex gap-3 justify-center pt-4">
-            <Button size="lg" onClick={handleExit}>
-              Back to Menu
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => {
-                gameEngine.resetGame()
-                window.location.reload()
-              }}
+      {/* Result Modal — HX Branded */}
+      <AnimatePresence>
+        {showResult && resultData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+              className="relative w-full max-w-md overflow-hidden rounded-3xl shadow-2xl font-nunito"
+              style={{ boxShadow: '0 25px 60px rgba(84,46,145,0.45), 0 8px 24px rgba(0,0,0,0.4)' }}
             >
-              Play Again
-            </Button>
+              {/* Header */}
+              <div className="relative px-8 pt-8 pb-10 text-white text-center overflow-hidden"
+                style={{ background: resultData.success
+                  ? 'linear-gradient(140deg, #6b3aad 0%, #542E91 45%, #3a1d6e 100%)'
+                  : 'linear-gradient(140deg, #7c3aed 0%, #4c1d95 50%, #2d1550 100%)' }}>
+                <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(253,220,6,0.15) 0%, transparent 70%)' }} />
+                <div className="absolute -bottom-16 -left-10 w-52 h-52 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(253,220,6,0.1) 0%, transparent 70%)' }} />
+
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-4 text-xs font-black tracking-widest uppercase"
+                  style={{ background: 'rgba(253,220,6,0.15)', border: '1px solid rgba(253,220,6,0.5)', color: '#FDDC06' }}
+                >
+                  {resultData.success ? '✅ Mission Complete' : '🔄 Try Again'}
+                </motion.div>
+
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 15 }}
+                  className="text-7xl mb-3"
+                >
+                  {resultData.success ? '🎉' : '🔄'}
+                </motion.div>
+
+                <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="text-xl font-black leading-snug">
+                  {resultData.message}
+                </motion.p>
+              </div>
+
+              {/* Body */}
+              <div className="bg-white px-7 py-6 space-y-4">
+                {resultData.learning && (
+                  <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.35 }}
+                    className="rounded-xl p-4"
+                    style={{ background: '#F0F0F0', borderLeft: '4px solid #542E91' }}>
+                    <p className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: '#542E91' }}>
+                      The HX Value
+                    </p>
+                    <p className="text-gray-700 font-semibold leading-relaxed text-sm italic">
+                      &quot;{resultData.learning}&quot;
+                    </p>
+                  </motion.div>
+                )}
+
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex gap-3">
+                  {resultData.success ? (
+                    <button onClick={continueToNextRoom}
+                      className="flex-1 py-4 rounded-2xl text-lg font-black tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={{ background: '#FDDC06', color: '#232323', boxShadow: '0 4px 20px rgba(253,220,6,0.4)' }}>
+                      Continue →
+                    </button>
+                  ) : (
+                    <>
+                      <button onClick={handleExit}
+                        className="flex-1 py-4 rounded-2xl text-base font-bold border-2 transition-all hover:scale-[1.02]"
+                        style={{ borderColor: '#542E91', color: '#542E91' }}>
+                        Exit
+                      </button>
+                      <button onClick={retryRoom}
+                        className="flex-1 py-4 rounded-2xl text-lg font-black tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        style={{ background: '#FDDC06', color: '#232323', boxShadow: '0 4px 20px rgba(253,220,6,0.4)' }}>
+                        ↺ Retry
+                      </button>
+                    </>
+                  )}
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
-      </Modal>
+        )}
+      </AnimatePresence>
+
+      {/* Additional Event (Room 2 Red Button) — HX Branded */}
+      <AnimatePresence>
+        {!!additionalEvent && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+              className="relative w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl font-nunito"
+              style={{ boxShadow: '0 25px 60px rgba(84,46,145,0.5)' }}
+            >
+              <div className="relative px-8 pt-8 pb-10 text-white text-center overflow-hidden"
+                style={{ background: 'linear-gradient(140deg, #7c1d1d 0%, #9b2020 40%, #542E91 100%)' }}>
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle at center, rgba(255,80,80,0.15) 0%, transparent 60%)' }} />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-5 text-xs font-black tracking-widest uppercase"
+                  style={{ background: 'rgba(253,220,6,0.15)', border: '1px solid rgba(253,220,6,0.5)', color: '#FDDC06' }}>
+                  ⚠️ Decision Point
+                </div>
+                <motion.div
+                  animate={{ scale: [1, 1.12, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="text-7xl mb-4">🔴</motion.div>
+                <p className="text-xl font-black leading-snug">{additionalEvent?.instruction}</p>
+              </div>
+              <div className="bg-white px-7 py-6">
+                <div className="flex gap-3">
+                  {additionalEvent?.choices.map((choice: any, i: number) => (
+                    <button key={choice.id} onClick={() => handleAdditionalEventSubmit(choice.id)}
+                      className="flex-1 py-4 rounded-2xl text-lg font-black tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={i === 0
+                        ? { background: '#FDDC06', color: '#232323', boxShadow: '0 4px 20px rgba(253,220,6,0.4)' }
+                        : { background: '#542E91', color: '#fff', boxShadow: '0 4px 20px rgba(84,46,145,0.3)' }
+                      }>
+                      {choice.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Pause Modal — HX Branded */}
+      <AnimatePresence>
+        {showPauseModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              onClick={() => setShowPauseModal(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+              className="relative w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl font-nunito"
+              style={{ boxShadow: '0 25px 60px rgba(84,46,145,0.45)' }}
+            >
+              <div className="relative px-8 pt-7 pb-8 text-white text-center overflow-hidden"
+                style={{ background: 'linear-gradient(140deg, #6b3aad 0%, #542E91 45%, #3a1d6e 100%)' }}>
+                <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(253,220,6,0.15) 0%, transparent 70%)' }} />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-4 text-xs font-black tracking-widest uppercase"
+                  style={{ background: 'rgba(253,220,6,0.15)', border: '1px solid rgba(253,220,6,0.5)', color: '#FDDC06' }}>
+                  ⏸ Game Paused
+                </div>
+                <div className="text-5xl mb-3">☕</div>
+                <p className="text-white/80 text-sm font-semibold">
+                  Progress automatically saved — take your time!
+                </p>
+              </div>
+              <div className="bg-white px-7 py-5 flex gap-3">
+                <button onClick={handleExit}
+                  className="flex-1 py-3.5 rounded-2xl text-base font-bold border-2 transition-all hover:scale-[1.02]"
+                  style={{ borderColor: '#542E91', color: '#542E91' }}>
+                  Exit
+                </button>
+                <button onClick={() => setShowPauseModal(false)}
+                  className="flex-1 py-3.5 rounded-2xl text-base font-black transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ background: '#FDDC06', color: '#232323', boxShadow: '0 4px 14px rgba(253,220,6,0.4)' }}>
+                  ▶ Resume
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Completion Modal — HX Branded */}
+      <AnimatePresence>
+        {showCompletionModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+              className="relative w-full max-w-lg overflow-hidden rounded-3xl shadow-2xl font-nunito"
+              style={{ boxShadow: '0 30px 80px rgba(84,46,145,0.6)' }}
+            >
+              {/* Epic purple header */}
+              <div className="relative px-8 pt-8 pb-10 text-white text-center overflow-hidden"
+                style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #542E91 40%, #3a1d6e 80%, #1e0a40 100%)' }}>
+                <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(253,220,6,0.2) 0%, transparent 60%)' }} />
+                <div className="absolute -bottom-20 -left-16 w-64 h-64 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(253,220,6,0.15) 0%, transparent 65%)' }} />
+
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-5 text-xs font-black tracking-widest uppercase"
+                  style={{ background: 'rgba(253,220,6,0.15)', border: '1px solid rgba(253,220,6,0.5)', color: '#FDDC06' }}>
+                  🏆 AI Core Restored
+                </div>
+
+                <motion.div
+                  initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 15 }}
+                  className="text-8xl mb-4">🏆</motion.div>
+
+                <h2 className="text-3xl font-black mb-3 leading-tight">
+                  All Five HX Values Restored!
+                </h2>
+                <p className="text-white/75 text-sm font-semibold leading-relaxed">
+                  The AI Core is fully operational. You&apos;ve demonstrated all five Holiday Extras values.
+                </p>
+
+                {/* 5 value badges */}
+                <div className="flex flex-wrap justify-center gap-2 mt-5">
+                  {['Be At The Helm', 'Be Courageous', 'Be One Team', 'Be The Best Version of You', 'Be Pioneering'].map((v) => (
+                    <span key={v} className="px-2.5 py-1 rounded-full text-xs font-bold"
+                      style={{ background: 'rgba(253,220,6,0.15)', border: '1px solid rgba(253,220,6,0.4)', color: '#FDDC06' }}>
+                      ✓ {v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="bg-white px-7 py-6 space-y-4">
+                {/* Score */}
+                <div className="rounded-2xl p-5 text-center"
+                  style={{ background: 'linear-gradient(135deg, #f5f0ff 0%, #fefce8 100%)', border: '2px solid #542E91' }}>
+                  <p className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#542E91' }}>Your Final Score</p>
+                  <p className="text-5xl font-black" style={{ color: '#542E91' }}>
+                    {playerProgress?.totalScore || 0}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1 font-semibold">points</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button onClick={handleExit}
+                    className="flex-1 py-3.5 rounded-2xl text-base font-bold border-2 transition-all hover:scale-[1.02]"
+                    style={{ borderColor: '#542E91', color: '#542E91' }}>
+                    Back to Menu
+                  </button>
+                  <button onClick={() => { gameEngine.resetGame(); window.location.reload() }}
+                    className="flex-1 py-3.5 rounded-2xl text-base font-black transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ background: '#FDDC06', color: '#232323', boxShadow: '0 4px 20px rgba(253,220,6,0.4)' }}>
+                    ↺ Play Again
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Toast notifications */}
       {toast && (
