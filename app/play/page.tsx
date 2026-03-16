@@ -283,53 +283,174 @@ export default function PlayPage() {
         {gameState === 'briefing' && <div className="text-center">Loading briefing...</div>}
       </HUD>
 
-      {/* Briefing Modal */}
-      <Modal
-        isOpen={showBriefing}
-        onClose={() => {}}
-        closeOnOverlayClick={false}
-        showCloseButton={false}
-        title="Mission Briefing"
-        size="lg"
-      >
-        {currentRoomConfig && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-6"
-          >
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 relative">
-                  <Image
-                    src={roomBadges[currentRoomConfig.id] || '/assets/placeholders/room-helm.gif'}
-                    alt={currentRoomConfig.value}
-                    fill
-                    className="object-contain"
-                    unoptimized
-                  />
-                </div>
+      {/* Mission Briefing — HX Branded */}
+      <AnimatePresence>
+        {showBriefing && currentRoomConfig && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/75 backdrop-blur-md"
+            />
+
+            {/* Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+              className="relative w-full max-w-md overflow-hidden rounded-3xl shadow-2xl font-nunito"
+              style={{ boxShadow: '0 25px 60px rgba(84,46,145,0.45), 0 8px 24px rgba(0,0,0,0.4)' }}
+            >
+              {/* ── Purple Header ── */}
+              <div
+                className="relative px-8 pt-8 pb-10 text-white text-center overflow-hidden"
+                style={{ background: 'linear-gradient(140deg, #6b3aad 0%, #542E91 45%, #3a1d6e 100%)' }}
+              >
+                {/* Decorative blobs */}
+                <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(253,220,6,0.18) 0%, transparent 70%)' }} />
+                <div className="absolute -bottom-16 -left-10 w-52 h-52 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(253,220,6,0.12) 0%, transparent 70%)' }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 60%)' }} />
+
+                {/* MISSION BRIEFING badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-5 text-xs font-black tracking-widest uppercase relative"
+                  style={{ background: 'rgba(253,220,6,0.15)', border: '1px solid rgba(253,220,6,0.5)', color: '#FDDC06' }}
+                >
+                  <span>⚡</span> Mission Briefing
+                </motion.div>
+
+                {/* GIF — on dark purple, now fully visible */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 20 }}
+                  className="flex justify-center mb-5 relative"
+                >
+                  <div
+                    className="w-32 h-32 relative rounded-2xl overflow-hidden"
+                    style={{
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '2px solid rgba(253,220,6,0.4)',
+                      boxShadow: '0 0 30px rgba(253,220,6,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                    }}
+                  >
+                    <Image
+                      src={roomBadges[currentRoomConfig.id] || '/assets/placeholders/room-helm.gif'}
+                      alt={currentRoomConfig.value}
+                      fill
+                      className="object-contain p-2"
+                      unoptimized
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Room number */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-xs font-bold tracking-widest uppercase mb-1"
+                  style={{ color: 'rgba(253,220,6,0.75)' }}
+                >
+                  Room {currentRoomIndex} of 5
+                </motion.p>
+
+                {/* Room title */}
+                <motion.h2
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.22 }}
+                  className="text-3xl font-black tracking-tight mb-4 leading-tight"
+                >
+                  {currentRoomConfig.roomTitle}
+                </motion.h2>
+
+                {/* Value pill */}
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.28 }}
+                  className="inline-flex items-center px-5 py-1.5 rounded-full text-sm font-black"
+                  style={{ background: '#FDDC06', color: '#232323' }}
+                >
+                  {currentRoomConfig.value}
+                </motion.span>
+
+                {/* Room progress dots */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.32 }}
+                  className="flex justify-center gap-2 mt-5"
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <div
+                      key={n}
+                      className="rounded-full transition-all"
+                      style={{
+                        width: n === currentRoomIndex ? 20 : 8,
+                        height: 8,
+                        background: n < currentRoomIndex
+                          ? '#FDDC06'
+                          : n === currentRoomIndex
+                          ? '#FDDC06'
+                          : 'rgba(255,255,255,0.25)',
+                        opacity: n < currentRoomIndex ? 0.6 : 1,
+                      }}
+                    />
+                  ))}
+                </motion.div>
               </div>
-              <h3 className="text-2xl font-bold mb-2">{currentRoomConfig.roomTitle}</h3>
-              <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold">
-                {currentRoomConfig.value}
-              </p>
-            </div>
 
-            <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-              <p className="text-gray-700 dark:text-gray-300">
-                {currentRoomConfig.task.instruction}
-              </p>
-            </div>
+              {/* ── White Body ── */}
+              <div className="bg-white px-7 py-6 space-y-5">
+                {/* Objective */}
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 }}
+                  className="rounded-xl p-4"
+                  style={{ background: '#F0F0F0', borderLeft: '4px solid #542E91' }}
+                >
+                  <p className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: '#542E91' }}>
+                    Your Objective
+                  </p>
+                  <p className="text-gray-700 font-semibold leading-relaxed text-sm">
+                    {currentRoomConfig.task.instruction}
+                  </p>
+                </motion.div>
 
-            <div className="flex justify-center">
-              <Button size="lg" onClick={startCurrentRoom}>
-                Start Challenge
-              </Button>
-            </div>
-          </motion.div>
+                {/* CTA */}
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  onClick={startCurrentRoom}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full py-4 rounded-2xl text-lg font-black tracking-wide transition-shadow"
+                  style={{
+                    background: '#FDDC06',
+                    color: '#232323',
+                    boxShadow: '0 4px 20px rgba(253,220,6,0.5)',
+                  }}
+                >
+                  ⚡ Start Challenge
+                </motion.button>
+              </div>
+            </motion.div>
+          </div>
         )}
-      </Modal>
+      </AnimatePresence>
 
       {/* Result Modal */}
       <Modal

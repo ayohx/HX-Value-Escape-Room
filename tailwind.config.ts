@@ -10,8 +10,12 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        nunito: ['var(--font-nunito)', 'Nunito', 'system-ui', 'sans-serif'],
       },
       colors: {
+        'hx-purple': '#542E91',
+        'hx-yellow': '#FDDC06',
+        'hx-dark': '#232323',
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',
