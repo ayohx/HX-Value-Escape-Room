@@ -10,6 +10,7 @@ interface HUDProps {
     title: string
     value: string
     status: RoomStatus
+    gif?: string
   }[]
   currentRoomId?: string
   onRoomClick?: (roomId: string) => void

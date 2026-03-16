@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 interface RoomStageProps {
   roomTitle?: string
   roomValue?: string
+  roomGif?: string
   instruction?: string
   children: ReactNode
   onHint?: () => void
@@ -21,6 +22,7 @@ interface RoomStageProps {
 export default function RoomStage({
   roomTitle,
   roomValue,
+  roomGif,
   instruction,
   children,
   onHint,
@@ -42,25 +44,40 @@ export default function RoomStage({
           transition={{ duration: 0.4 }}
         >
           <Card variant="elevated" padding="md" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
+            <div className="flex items-center gap-4">
+
+              {/* Left: Room GIF */}
+              {roomGif && (
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ring-2 ring-white/30 shadow-lg">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={roomGif}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    aria-hidden="true"
+                  />
+                </div>
+              )}
+
+              {/* Center: Value label + Room title */}
+              <div className="flex-1 min-w-0">
                 {roomValue && (
-                  <div className="text-sm font-medium opacity-90 mb-1">
+                  <div className="text-sm font-medium opacity-90 mb-0.5 truncate">
                     {roomValue}
                   </div>
                 )}
                 {roomTitle && (
-                  <h2 className="text-2xl sm:text-3xl font-bold">
+                  <h2 className="text-2xl sm:text-3xl font-bold leading-tight truncate">
                     {roomTitle}
                   </h2>
                 )}
               </div>
 
-              {/* Timer */}
+              {/* Right: Timer (if active) */}
               {showTimer && timeRemaining !== undefined && (
                 <motion.div
                   className={`
-                    flex items-center justify-center w-20 h-20 rounded-full border-4
+                    flex-shrink-0 flex items-center justify-center w-16 h-16 rounded-full border-4
                     ${isTimerWarning ? 'border-red-400 bg-red-500/20' : 'border-white/50 bg-white/10'}
                   `}
                   animate={isTimerWarning ? { scale: [1, 1.1, 1] } : {}}
@@ -70,19 +87,19 @@ export default function RoomStage({
                   aria-label={`${timeRemaining} seconds remaining`}
                 >
                   <div className="text-center">
-                    <div className="text-2xl font-bold">{timeRemaining}</div>
+                    <div className="text-xl font-bold leading-none">{timeRemaining}</div>
                     <div className="text-xs opacity-75">sec</div>
                   </div>
                 </motion.div>
               )}
 
-              {/* Hint button */}
+              {/* Right: Hint button */}
               {onHint && (
                 <Button
                   onClick={onHint}
                   disabled={!hintAvailable}
                   variant="ghost"
-                  className="text-white border-2 border-white/50 hover:bg-white/20"
+                  className="flex-shrink-0 text-white border-2 border-white/50 hover:bg-white/20"
                   aria-label={`Use hint. ${hintsUsed} hints used so far`}
                 >
                   <svg

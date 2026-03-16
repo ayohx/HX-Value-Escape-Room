@@ -232,18 +232,6 @@ export default function PlayPage() {
     }
   }
 
-  // Get rooms for HUD
-  const rooms = gameEngine.getRooms().map((room) => ({
-    id: room.id,
-    title: room.roomTitle,
-    value: room.value,
-    status: playerProgress?.rooms[room.id]?.status || 'locked',
-  }))
-
-  const currentRoomIndex = currentRoomId
-    ? gameEngine.getRoomIds().indexOf(currentRoomId) + 1
-    : 0
-
   // Map room IDs to badge images
   const roomBadges: Record<string, string> = {
     room1_helm: '/assets/placeholders/room-helm.gif',
@@ -252,6 +240,19 @@ export default function PlayPage() {
     room4_upgrade: '/assets/placeholders/room-upgrade.gif',
     room5_innovation: '/assets/placeholders/room-innovation.gif',
   }
+
+  // Get rooms for HUD
+  const rooms = gameEngine.getRooms().map((room) => ({
+    id: room.id,
+    title: room.roomTitle,
+    value: room.value,
+    status: playerProgress?.rooms[room.id]?.status || 'locked',
+    gif: roomBadges[room.id],
+  }))
+
+  const currentRoomIndex = currentRoomId
+    ? gameEngine.getRoomIds().indexOf(currentRoomId) + 1
+    : 0
 
   return (
     <>
@@ -269,6 +270,7 @@ export default function PlayPage() {
           <RoomStage
             roomTitle={currentRoomConfig.roomTitle}
             roomValue={currentRoomConfig.value}
+            roomGif={roomBadges[currentRoomConfig.id]}
             instruction={currentRoomConfig.task.instruction}
             onHint={() => {
               if (currentRoomId) {
