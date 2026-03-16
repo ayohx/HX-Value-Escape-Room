@@ -267,7 +267,8 @@ export default function PlayPage() {
             onHint={() => {
               if (currentRoomId) {
                 gameEngine.useHint(currentRoomId)
-                setToast({ message: 'Hint available in next version!', type: 'info' })
+                const hint = currentRoomConfig?.onSuccess?.learning || 'Think carefully about the values — what would a great teammate do?'
+                setToast({ message: `💡 Hint: ${hint}`, type: 'info' })
               }
             }}
             hintAvailable={true}

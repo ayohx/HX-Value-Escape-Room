@@ -104,15 +104,23 @@ export default function AICore({ rooms, currentRoomId, onRoomClick }: AICoreProp
           const isClickable = room.status !== 'locked' && onRoomClick
 
           return (
-            <button
+            <motion.button
               key={room.id}
               onClick={() => isClickable && onRoomClick(room.id)}
               disabled={!isClickable}
+              animate={isCurrent ? {
+                boxShadow: [
+                  '0 0 0px rgba(59,130,246,0)',
+                  '0 0 8px rgba(59,130,246,0.6)',
+                  '0 0 0px rgba(59,130,246,0)',
+                ]
+              } : {}}
+              transition={isCurrent ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : {}}
               className={`
                 w-full text-left p-3 rounded-lg border transition-all
                 ${
                   isCurrent
-                    ? 'border-blue-500 bg-blue-500/10'
+                    ? 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/40'
                     : room.status === 'completed'
                     ? 'border-green-500/50 bg-green-500/5'
                     : room.status === 'locked'
@@ -175,7 +183,7 @@ export default function AICore({ rooms, currentRoomId, onRoomClick }: AICoreProp
                   )}
                 </div>
               </div>
-            </button>
+            </motion.button>
           )
         })}
       </div>
